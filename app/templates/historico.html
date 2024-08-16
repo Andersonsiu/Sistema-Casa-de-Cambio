@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Reportes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Dashboard Section -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow-lg">
+                <div class="card-header">Total Transacciones</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ historico_data | length }}</h5>
+                    <p class="card-text">Número total de transacciones registradas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow-lg">
+                <div class="card-header">Ganancia Total en Dólares</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ ganancia_total_dolares | round(2) }}</h5>
+                    <p class="card-text">Ganancia acumulada en dólares.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3 shadow-lg">
+                <div class="card-header">Ganancia Total en Euros</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ ganancia_total_euros | round(2) }}</h5>
+                    <p class="card-text">Ganancia acumulada en euros.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section for Dólares -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-dark text-white text-center">
+            <h3><i class="fas fa-dollar-sign"></i> Historial de Reportes - Dólares</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ url_for('exportar_excel') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </a>
+            </div>
+            <div id="historicoTableDolares" class="table-responsive"></div>
+        </div>
+    </div>
+
+    <!-- Table Section for Euros -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fas fa-euro-sign"></i> Historial de Reportes - Euros</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ url_for('exportar_excel') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </a>
+            </div>
+            <div id="historicoTableEuros" class="table-responsive"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize Tabulator for Dolares
+        var tableDolares = new Tabulator("#historicoTableDolares", {
+            data: {{ historico_data | tojson | safe }},
+            layout: "fitColumns",
+            responsiveLayout: "hide",
+            pagination: "local",
+            paginationSize: 10,
+            paginationSizeSelector: [10, 25, 50, 100],
+            movableColumns: true,
+            resizableRows: true,
+            initialSort: [
+                {column: "fecha", dir: "desc"}
+            ],
+            columns: [
+                {title: "Fecha", field: "fecha", sorter: "date", hozAlign: "center"},
+                {title: "Caja Inicial Dólares", field: "caja_dolares.inicial", hozAlign: "center", formatter: "money"},
+                {title: "Caja Final Dólares", field: "caja_dolares.final", hozAlign: "center", formatter: "money"},
+                {title: "Ganancia en Soles (Dólares)", field: "caja_dolares.ganancia_soles", hozAlign: "center", formatter: "money"},
+                {title: "Ganancia en Dólares", field: "caja_dolares.ganancia_dolares", hozAlign: "center", formatter: "money"}
+            ],
+        });
+
+        // Initialize Tabulator for Euros
+        var tableEuros = new Tabulator("#historicoTableEuros", {
+            data: {{ historico_data | tojson | safe }},
+            layout: "fitColumns",
+            responsiveLayout: "hide",
+            pagination: "local",
+            paginationSize: 10,
+            paginationSizeSelector: [10, 25, 50, 100],
+            movableColumns: true,
+            resizableRows: true,
+            initialSort: [
+                {column: "fecha", dir: "desc"}
+            ],
+            columns: [
+                {title: "Fecha", field: "fecha", sorter: "date", hozAlign: "center"},
+                {title: "Caja Inicial Euros", field: "caja_euros.inicial", hozAlign: "center", formatter: "money"},
+                {title: "Caja Final Euros", field: "caja_euros.final", hozAlign: "center", formatter: "money"},
+                {title: "Ganancia en Soles (Euros)", field: "caja_euros.ganancia_soles", hozAlign: "center", formatter: "money"},
+                {title: "Ganancia en Euros", field: "caja_euros.ganancia_euros", hozAlign: "center", formatter: "money"}
+            ],
+        });
+
+        // Export to Excel
+        document.getElementById("exportExcelDolares").addEventListener("click", function() {
+            window.location.href = "{{ url_for('exportar_excel') }}";
+        });
+
+        document.getElementById("exportExcelEuros").addEventListener("click", function() {
+            window.location.href = "{{ url_for('exportar_excel') }}";
+        });
+    });
+</script>
+
+<!-- Include Tabulator library -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/js/tabulator.min.js"></script>
+{% endblock %}
+

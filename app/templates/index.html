@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron text-center bg-light shadow-lg rounded p-5">
+        <h1 class="display-4">Bienvenido a Multiservicios Rojas</h1>
+        <p class="lead">Su solución integral para el cambio de divisas y más.</p>
+        <hr class="my-4">
+        <p>Utilice nuestro servicio para cambiar dólares y euros de manera rápida y segura.</p>
+        <div class="d-flex justify-content-center mt-4">
+            <a class="btn btn-primary btn-lg mx-2" href="{{ url_for('dolares') }}" role="button">
+                <i class="fas fa-dollar-sign"></i> Transacciones en Dólares
+            </a>
+            <a class="btn btn-info btn-lg mx-2" href="{{ url_for('euros') }}" role="button">
+                <i class="fas fa-euro-sign"></i> Transacciones en Euros
+            </a>
+            <a class="btn btn-warning btn-lg mx-2" href="{{ url_for('reportes') }}" role="button">
+                <i class="fas fa-chart-line"></i> Ver Reportes
+            </a>
+            <a class="btn btn-secondary btn-lg mx-2" href="{{ url_for('historico') }}" role="button">
+                <i class="fas fa-history"></i> Ver Historial
+            </a>
+        </div>
+    </div>
+    
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="icon mb-3"><i class="fas fa-shield-alt fa-3x"></i></div>
+                    <h5 class="card-title">Seguro</h5>
+                    <p class="card-text">Garantizamos transacciones seguras y protegidas en todo momento.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="icon mb-3"><i class="fas fa-clock fa-3x"></i></div>
+                    <h5 class="card-title">Rápido</h5>
+                    <p class="card-text">Realice sus transacciones en cuestión de minutos con nuestro servicio eficiente.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="icon mb-3"><i class="fas fa-hand-holding-usd fa-3x"></i></div>
+                    <h5 class="card-title">Conveniente</h5>
+                    <p class="card-text">Ofrecemos las mejores tasas de cambio para maximizar su dinero.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

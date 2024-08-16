@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Transacciones en Euros{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fas fa-euro-sign"></i> Transacciones en Euros</h3>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <button class="btn btn-outline-primary mr-2" id="compra-btn" onclick="showForm('compra')"><i class="fas fa-shopping-cart"></i> Compra</button>
+                <button class="btn btn-outline-primary" id="venta-btn" onclick="showForm('venta')"><i class="fas fa-money-bill-wave"></i> Venta</button>
+            </div>
+            <form method="POST" action="{{ url_for('euros') }}" id="transaccion-form" class="needs-validation" novalidate>
+                <input type="hidden" id="tipo" name="tipo" value="compra">
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="cantidad_origen"><i class="fas fa-coins"></i> Cantidad Origen</label>
+                        <input type="number" step="0.01" class="form-control" id="cantidad_origen" name="cantidad_origen" required>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese una cantidad válida.
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="tasa_cambio"><i class="fas fa-exchange-alt"></i> Tasa de Cambio</label>
+                        <input type="number" step="0.0001" class="form-control" id="tasa_cambio" name="tasa_cambio" required>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese una tasa de cambio válida.
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3 text-center">
+                        <label for="fecha_transaccion"><i class="fas fa-calendar-day"></i> Fecha de Transacción</label>
+                        <input type="date" class="form-control w-auto d-inline-block" id="fecha_transaccion" name="fecha_transaccion" required>
+                        <div class="invalid-feedback">
+                            Por favor, seleccione una fecha.
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Añadir Transacción</button>
+            </form>
+        </div>
+        <div class="card-footer">
+            <h5 class="text-center"><i class="fas fa-history"></i> Historial de Transacciones</h5>
+            <div class="table-responsive">
+                <table id="transactionsTable" class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Moneda Origen</th>
+                            <th>Moneda Destino</th>
+                            <th>Tasa de Cambio</th>
+                            <th>Cantidad Origen</th>
+                            <th>Cantidad Destino</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaccion in transacciones %}
+                        <tr>
+                            <td>{{ transaccion.fecha }}</td>
+                            <td>{{ transaccion.tipo }}</td>
+                            <td>{{ transaccion.moneda_origen }}</td>
+                            <td>{{ transaccion.moneda_destino }}</td>
+                            <td>{{ transaccion.tasa_cambio }}</td>
+                            <td>{{ transaccion.cantidad_origen }}</td>
+                            <td>{{ "%.2f"|format(transaccion.cantidad_destino) }}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="eliminarTransaccion('{{ transaccion._id }}', 'euros')"><i class="fas fa-trash"></i> Eliminar</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showForm(tipo) {
+    document.getElementById('tipo').value = tipo;
+    if (tipo === 'compra') {
+        document.querySelector('.card-header h3').innerText = 'Compra de Euros';
+        document.getElementById('compra-btn').classList.add('active');
+        document.getElementById('venta-btn').classList.remove('active');
+    } else {
+        document.querySelector('.card-header h3').innerText = 'Venta de Euros';
+        document.getElementById('venta-btn').classList.add('active');
+        document.getElementById('compra-btn').classList.remove('active');
+    }
+}
+
+function eliminarTransaccion(id, tipo) {
+    if (confirm('¿Está seguro de que desea eliminar esta transacción?')) {
+        fetch(`/eliminar_transaccion/${tipo}/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error al eliminar la transacción.');
+            }
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Configurar la fecha de hoy en la zona horaria de Lima, Perú
+    const limaTime = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+    const today = new Date(limaTime);
+    const year = today.getFullYear();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2); // Agrega 1 al mes ya que getMonth() devuelve 0 para enero
+    const day = ('0' + today.getDate()).slice(-2);
+    const formattedDate = `${year}-${month}-${day}`;
+    
+    // Asignamos la fecha actual al campo de fecha de transacción
+    document.getElementById('fecha_transaccion').value = formattedDate;
+});
+</script>
+{% endblock %}
+

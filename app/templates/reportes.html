@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fas fa-chart-line"></i> Reportes de Transacciones</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('reportes') }}" id="report-form" class="needs-validation" novalidate>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="tipo_reporte"><i class="fas fa-filter"></i> Tipo de Reporte</label>
+                        <select class="form-control" id="tipo_reporte" name="tipo_reporte" onchange="updateDateInputs()" required>
+                            <option value="">Seleccione...</option>
+                            <option value="diario">Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                        <div class="invalid-feedback">Por favor seleccione un tipo de reporte.</div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="gastos"><i class="fas fa-money-bill-wave"></i> Gastos</label>
+                        <input type="number" step="0.01" class="form-control" id="gastos" name="gastos">
+                        <div class="invalid-feedback">Por favor ingrese los gastos.</div>
+                    </div>
+                </div>
+
+                <!-- Diario Input Group -->
+                <div class="form-group" id="diario-input">
+                    <label for="fecha_diario"><i class="fas fa-calendar-day"></i> Día</label>
+                    <input type="date" class="form-control" id="fecha_diario" name="fecha_diario" value="{{ fecha_hoy }}" required>
+                    <div class="invalid-feedback">Por favor seleccione una fecha.</div>
+                </div>
+
+                <!-- Semanal Input Group -->
+                <div class="form-group" id="semanal-input" style="display:none;">
+                    <label for="fecha_inicio_semanal"><i class="fas fa-calendar-week"></i> Semana Inicio</label>
+                    <input type="date" class="form-control mb-2" id="fecha_inicio_semanal" name="fecha_inicio_semanal" required>
+                    <label for="fecha_fin_semanal"><i class="fas fa-calendar-week"></i> Semana Fin</label>
+                    <input type="date" class="form-control" id="fecha_fin_semanal" name="fecha_fin_semanal" required>
+                    <div class="invalid-feedback">Por favor seleccione un rango de fechas.</div>
+                </div>
+
+                <!-- Mensual Input Group -->
+                <div class="form-group" id="mensual-input" style="display:none;">
+                    <label for="mes"><i class="fas fa-calendar-alt"></i> Mes</label>
+                    <select class="form-control" id="mes" name="mes" required>
+                        <option value="">Seleccione...</option>
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                    <div class="invalid-feedback">Por favor seleccione un mes.</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="caja_inicial"><i class="fas fa-wallet"></i> Caja Inicial en Dólares</label>
+                        <input type="number" step="0.01" class="form-control" id="caja_inicial" name="caja_inicial" required>
+                        <div class="invalid-feedback">Por favor ingrese la caja inicial en dólares.</div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="caja_inicial_euros"><i class="fas fa-wallet"></i> Caja Inicial en Euros (opcional)</label>
+                        <input type="number" step="0.01" class="form-control" id="caja_inicial_euros" name="caja_inicial_euros">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <button type="submit" class="btn btn-primary btn-block mt-2"><i class="fas fa-calculator"></i> Calcular Caja</button>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-danger btn-block mt-2" onclick="clearForm()"><i class="fas fa-trash"></i> Limpiar Formulario</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Dólares -->
+        <div class="col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-header bg-info text-white text-center">Dólares</div>
+                <div class="stat-card-body">
+                    <div class="stat-item">
+                        <p>Compra Total Origen</p>
+                        <p class="value">{{ caja_dolares_compra_origen | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Venta Total Origen</p>
+                        <p class="value">{{ caja_dolares_venta_origen | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Compra Total Destino</p>
+                        <p class="value">{{ caja_dolares_compra_destino | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Venta Total Destino</p>
+                        <p class="value">{{ caja_dolares_venta_destino | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Margen de Compra</p>
+                        <p class="value">{{ margen_compra_dolares | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Margen de Venta</p>
+                        <p class="value">{{ margen_venta_dolares | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item text-center" style="color: {% if diferencia_margen_dolares < 0 %}red{% else %}black{% endif %};">
+                        <p>Diferencia de Margen</p>
+                        <p class="value">{{ diferencia_margen_dolares | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item text-success">
+                        <p>Ganancia en Soles</p>
+                        <p class="value">{{ ganancia_soles_dolares | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item text-danger">
+                        <p>Gastos</p>
+                        <p class="value">{{ gastos | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item text-success">
+                        <p>Ganancia en Dólares</p>
+                        <p class="value">{{ ganancia_dolares | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Caja Final en Dólares</p>
+                        <p class="value">{{ caja_final_dolares | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-box"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Euros -->
+        <div class="col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-header bg-info text-white text-center">Euros</div>
+                <div class="stat-card-body">
+                    <div class="stat-item">
+                        <p>Compra Total Origen</p>
+                        <p class="value">{{ caja_euros_compra_origen | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-euro-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Venta Total Origen</p>
+                        <p class="value">{{ caja_euros_venta_origen | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-euro-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Compra Total Destino</p>
+                        <p class="value">{{ caja_euros_compra_destino | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-euro-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Venta Total Destino</p>
+                        <p class="value">{{ caja_euros_venta_destino | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-euro-sign"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Margen de Compra</p>
+                        <p class="value">{{ margen_compra_euros | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Margen de Venta</p>
+                        <p class="value">{{ margen_venta_euros | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item text-center" style="color: {% if diferencia_margen_euros < 0 %}red{% else %}black{% endif %};">
+                        <p>Diferencia de Margen</p>
+                        <p class="value">{{ diferencia_margen_euros | default(0) | round(4) }}</p>
+                        <div class="icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-item text-success">
+                        <p>Ganancia en Soles</p>
+                        <p class="value">{{ ganancia_soles_euros | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item text-danger">
+                        <p>Gastos</p>
+                        <p class="value">{{ gastos | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item text-success">
+                        <p>Ganancia en Euros</p>
+                        <p class="value">{{ ganancia_euros | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-item">
+                        <p>Caja Final en Euros</p>
+                        <p class="value">{{ caja_final_euros | default(0) | round(2) }}</p>
+                        <div class="icon"><i class="fas fa-box"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exportar a CSV -->
+    <div class="card shadow-lg mt-4">
+        <div class="card-header bg-secondary text-white text-center">
+            <h5><i class="fas fa-file-csv"></i> Exportar Reporte</h5>
+        </div>
+        <div class="card-body text-center">
+            <a href="{{ url_for('exportar_csv') }}" class="btn btn-success">
+                <i class="fas fa-download"></i> Exportar a CSV
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateDateInputs() {
+    var tipo_reporte = document.getElementById('tipo_reporte').value;
+    document.getElementById('diario-input').style.display = (tipo_reporte === 'diario') ? 'block' : 'none';
+    document.getElementById('semanal-input').style.display = (tipo_reporte === 'semanal') ? 'block' : 'none';
+    document.getElementById('mensual-input').style.display = (tipo_reporte === 'mensual') ? 'block' : 'none';
+}
+
+// Initialize with today's date
+document.getElementById('fecha_diario').value = new Date().toISOString().split('T')[0];
+
+document.addEventListener('DOMContentLoaded', function () {
+    updateDateInputs();
+    // Load form data from local storage
+    var formElements = document.getElementById('report-form').elements;
+    for (var i = 0; i < formElements.length; i++) {
+        var fieldName = formElements[i].name;
+        if (localStorage.getItem(fieldName)) {
+            formElements[i].value = localStorage.getItem(fieldName);
+        }
+    }
+
+    // Save form data to local storage on change
+    document.getElementById('report-form').addEventListener('change', function() {
+        var formElements = this.elements;
+        for (var i = 0; i < formElements.length; i++) {
+            var fieldName = formElements[i].name;
+            if (formElements[i].value) {
+                localStorage.setItem(fieldName, formElements[i].value);
+            }
+        }
+    });
+});
+
+function clearForm() {
+    var formElements = document.getElementById('report-form').elements;
+    for (var i = 0; i < formElements.length; i++) {
+        var fieldName = formElements[i].name;
+        formElements[i].value = '';
+        localStorage.removeItem(fieldName);
+    }
+}
+</script>
+{% endblock %}
+
