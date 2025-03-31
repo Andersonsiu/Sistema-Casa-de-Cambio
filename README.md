@@ -18,7 +18,6 @@ Este proyecto es un sistema de gestión para una casa de cambio, diseñado para 
 - **Flask**: Microframework de Python para desarrollo web.
 - **MongoDB**: Base de datos NoSQL utilizada para el almacenamiento de datos.
 - **Docker**: Contenedorización del proyecto para un despliegue fácil y consistente.
-- **Firebase Hosting**: Utilizado para desplegar la aplicación.
 - **Bootstrap**: Para el diseño responsivo y estilizado del frontend.
 
  ## Contribuciones
